@@ -30,4 +30,54 @@ public class Platform : MonoBehaviour
             gameObject.SetActive(false);
         }
     }
+    void BreakableDeactivate()
+    {
+        Invoke("DeactivateGameObject", 0.35f);
+    }
+    void DeactivateGameObject()
+    {
+        SoundManager.instance.IceBreakSound();
+        gameObject.SetActive(false);
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.tag == "Player")
+        {
+            if (is_Spike)
+            {
+                collision.transform.position = new Vector2(1000f, 1000f);
+                SoundManager.instance.GameOverSound();
+                GameManager.instance.RestartGame();
+            }
+        }
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.tag == "Player")
+        {
+            if (is_Breakable)
+            {
+                SoundManager.instance.LandSound();
+                anim.Play("Break");
+            }
+            if (is_Platform)
+            {
+                SoundManager.instance.LandSound();
+            }
+        }
+    }
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if(collision.gameObject.tag == "Player")
+        {
+            if (moving_Platform_Left)
+            {
+                collision.gameObject.GetComponent<PlayerMovement>().PlatformMove(-1f);
+            }
+            if (moving_Platform_Right)
+            {
+                collision.gameObject.GetComponent<PlayerMovement>().PlatformMove(1f);
+            }
+        }
+    }
 }
